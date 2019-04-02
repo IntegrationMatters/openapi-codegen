@@ -468,6 +468,7 @@ function convertToApis(source, obj, defaults) {
           //}
           //else {
           entry.classname = tagName + 'Api';
+          entry.serviceName = tagName.charAt(0).toLowerCase() + tagName.slice(1) + 'Api';
           //}
           entry.classFilename = tagName + 'Api';
           entry.classVarName = tagName; // see issue #21
@@ -590,9 +591,16 @@ const typeMaps = {
     let result = type;
     if(result === 'integer') result = 'number';
     if(result === 'array') {
+      console.log("type", type);
+      console.log("schema", schema);
       result = 'Array';
       if(schema.items && schema.items.type) {
-        result += '<' + typeMap(schema.items.type, false, schema.items) + '>';
+        if(schema.items.type === "object" && schema.items["x-oldref"]) {
+          const modelName = "models." + toCamel(schema.items["x-oldref"].replace("#/components/schemas/", ""));
+          result += '<' + modelName + '>';
+        } else {
+          result += '<' + typeMap(schema.items.type, false, schema.items) + '>';
+        }
       }
     }
     return result;
@@ -617,7 +625,7 @@ const reservedWords = {
   go: ['type']
 };
 
-let typeMap = typeMaps.nop;
+let typeMap = typeMaps.typescript;
 let markdownPP = markdownPPs.nop;
 let reserved = reservedWords.nop;
 
