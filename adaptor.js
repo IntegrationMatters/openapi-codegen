@@ -602,7 +602,6 @@ const typeMaps = {
       }
     }
     if(result === "object" && schema["x-oldref"]) {
-      console.log("schema", schema);
       result = "models." + toCamel(schema["x-oldref"].replace("#/components/schemas/", ""));
     }
     return result;
