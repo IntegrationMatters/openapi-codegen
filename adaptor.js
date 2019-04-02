@@ -591,8 +591,6 @@ const typeMaps = {
     let result = type;
     if(result === 'integer') result = 'number';
     if(result === 'array') {
-      console.log("type", type);
-      console.log("schema", schema);
       result = 'Array';
       if(schema.items && schema.items.type) {
         if(schema.items.type === "object" && schema.items["x-oldref"]) {
