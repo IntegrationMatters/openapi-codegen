@@ -588,9 +588,6 @@ const typeMaps = {
     return result;
   },
   typescript: function(type, required, schema) {
-    if(schema["x-oldref"]) {
-      return "models." + toCamel(schema["x-oldref"].replace("#/components/schemas/", ""));
-    }
 
     let result = type;
     if(result === 'integer') result = 'number';
@@ -604,6 +601,8 @@ const typeMaps = {
           result += '<' + typeMap(schema.items.type, false, schema.items) + '>';
         }
       }
+    } else if(schema["x-oldref"]) {
+      return "models." + toCamel(schema["x-oldref"].replace("#/components/schemas/", ""));
     }
 
     return result;
