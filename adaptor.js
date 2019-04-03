@@ -928,6 +928,10 @@ function transform(api, defaults, callback) {
           model.parent = schema.allOf[0]["x-oldref"].replace("#/components/schemas/", "");
 
           if(schema.allOf[1]) {
+            if(!schema.allOf[1].required) {
+              schema.allOf[1].required = [];
+            }
+
             if(schema.allOf[0].required && schema.allOf[1].required) {
               schema.allOf[1].required = schema.allOf[0].required.concat(schema.allOf[1].required)
             }
@@ -939,6 +943,7 @@ function transform(api, defaults, callback) {
         walkSchema(schema, {}, wsGetState, function(schema, parent, state) {
           let entry = {};
           entry.name = schema.name || schema.title;
+
           if(!entry.name && state.property && (state.property.startsWith('properties') ||
             state.property.startsWith('additionalProperties'))) {
             entry.name = state.property.split('/')[1];
@@ -963,6 +968,12 @@ function transform(api, defaults, callback) {
           entry.type = typeMap(entry.type, entry.required, schema);
           entry.datatype = entry.type; //?
           entry.jsonSchema = safeJson(schema, null, 2);
+
+          if(entry.name === "x-oldref") {
+            console.log("entry", entry);
+            return;
+          }
+
           for(let p in schemaProperties) {
             if(typeof schema[p] !== 'undefined') entry[p] = schema[p];
           }
