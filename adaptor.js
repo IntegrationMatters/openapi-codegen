@@ -961,10 +961,6 @@ function transform(api, defaults, callback) {
           entry.isNotRequired = !entry.required;
           entry.readOnly = !!schema.readOnly;
           entry.type = typeMap(entry.type, entry.required, schema);
-
-          if(s === "DomainObject") {
-            console.log("entry.type", entry.name, ": ", entry.type);
-          }
           entry.datatype = entry.type; //?
           entry.jsonSchema = safeJson(schema, null, 2);
           for(let p in schemaProperties) {
