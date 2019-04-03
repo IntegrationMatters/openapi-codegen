@@ -588,6 +588,10 @@ const typeMaps = {
     return result;
   },
   typescript: function(type, required, schema) {
+    if(schema["x-oldref"]) {
+      return "models." + toCamel(schema["x-oldref"].replace("#/components/schemas/", ""));
+    }
+
     let result = type;
     if(result === 'integer') result = 'number';
     if(result === 'array') {
@@ -601,9 +605,7 @@ const typeMaps = {
         }
       }
     }
-    if(result === "object" && schema["x-oldref"]) {
-      result = "models." + toCamel(schema["x-oldref"].replace("#/components/schemas/", ""));
-    }
+
     return result;
   },
   go: function(type, required, schema) {
@@ -921,6 +923,19 @@ function transform(api, defaults, callback) {
         model.modelPackage = model.name;
         model.hasEnums = false;
         model.vars = [];
+
+        if(schema.allOf && schema.allOf[0] && schema.allOf[0]["x-oldref"]) {
+          model.parent = schema.allOf[0]["x-oldref"].replace("#/components/schemas/", "");
+
+          if(schema.allOf[1]) {
+            if(schema.allOf[0].required && schema.allOf[1].required) {
+              schema.allOf[1].required = schema.allOf[0].required.concat(schema.allOf[1].required)
+            }
+
+            schema = schema.allOf[1];
+          }
+        }
+
         walkSchema(schema, {}, wsGetState, function(schema, parent, state) {
           let entry = {};
           entry.name = schema.name || schema.title;
@@ -946,6 +961,10 @@ function transform(api, defaults, callback) {
           entry.isNotRequired = !entry.required;
           entry.readOnly = !!schema.readOnly;
           entry.type = typeMap(entry.type, entry.required, schema);
+
+          if(s === "DomainObject") {
+            console.log("entry.type", entry.name, ": ", entry.type);
+          }
           entry.datatype = entry.type; //?
           entry.jsonSchema = safeJson(schema, null, 2);
           for(let p in schemaProperties) {
