@@ -957,7 +957,7 @@ function transform(api, defaults, callback) {
           if(entry.isEnum) entry.isNotContainer = false;
           entry.isContainer = !entry.isNotContainer;
           if((schema.type === 'object') && schema.properties && schema.properties["x-oldref"]) {
-            entry.complexType = schema.properties["x-oldref"].replace('#/components/schemas/', '');
+            entry.complexType = "models." + toCamel(schema.properties["x-oldref"].replace('#/components/schemas/', ''));
           }
 
           entry.dataFormat = schema.format;
@@ -973,6 +973,7 @@ function transform(api, defaults, callback) {
               model.allowableValues.enumVars.push(e);
             }
             model.allowableValues.enumVars = convertArray(model.allowableValues.enumVars);
+            entry.enumValues = JSON.parse(JSON.stringify(model.allowableValues.enumVars));
           }
 
           if(entry.name && state.depth <= 1) {
