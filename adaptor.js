@@ -970,7 +970,6 @@ function transform(api, defaults, callback) {
           entry.jsonSchema = safeJson(schema, null, 2);
 
           if(entry.name === "x-oldref") {
-            console.log("entry", entry);
             return;
           }
 
